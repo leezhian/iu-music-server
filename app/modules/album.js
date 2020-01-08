@@ -1,0 +1,78 @@
+/**
+ * 专辑表
+ */
+const {Sequelize, Model} = require('sequelize');
+const {sequelize} = require('../../core/db');
+
+class Album extends Model {
+
+}
+
+Album.init({
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    comment: 'id'
+  },
+  singer_id: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    comment: '歌手id'
+  },
+  album_name: {
+    type: Sequelize.STRING(30),
+    allowNull: false,
+    comment: '专辑名'
+  },
+  cover: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    comment: '专辑图'
+  },
+  description: {
+    type: Sequelize.TEXT,
+    comment: '简介'
+  },
+  song_ids: {
+    type: Sequelize.TEXT,
+    comment: '歌曲ids，逗号隔开'
+  },
+  buy_total: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+    comment: '购买总数量'
+  },
+  price: {
+    type: Sequelize.INTEGER(2),
+    allowNull: false,
+    defaultValue: 0,
+    comment: '是否收费，0代表免费，其余代表多少钱'
+  },
+  createAt: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.NOW,
+    comment: '创建时间'
+  },
+  updateAt: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.NOW,
+    comment: '修改时间'
+  },
+  isDel: {
+    type: Sequelize.INTEGER(1),
+    allowNull: false,
+    defaultValue: 0,
+    comment: '是否删除，0否，1是'
+  }
+}, {
+  sequelize,
+  tableName: 'album'
+});
+
+module.exports = {
+  Album
+}
