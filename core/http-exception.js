@@ -7,7 +7,7 @@ class HttpException extends Error {
     super();
     this.errorCode = errorCode;
     this.code = code;
-    this.msg = msg;
+    this.message = msg;
   }
 }
 
@@ -16,7 +16,7 @@ class ParameterException extends HttpException {
   constructor(msg, errorCode) {
     super();
     this.code = 400;
-    this.msg = msg || '参数错误';
+    this.message = msg || '参数错误';
     this.errorCode = errorCode || 10001;
   }
 }
@@ -26,7 +26,7 @@ class NotFound extends HttpException {
   constructor(msg, errorCode) {
     super();
     this.code = 404;
-    this.msg = msg || '资源未找到';
+    this.message = msg || '资源未找到';
     this.errorCode = errorCode || 50001;
   }
 }
@@ -36,7 +36,7 @@ class AuthFailed extends HttpException {
   constructor(msg, errorCode) {
     super();
     this.code = 401;
-    this.msg = msg || '授权失败';
+    this.message = msg || '授权失败';
     this.errorCode = errorCode || 20006;
   }
 }
@@ -46,8 +46,28 @@ class Forbiden extends HttpException {
   constructor(msg, errorCode) {
     super();
     this.code = 403;
-    this.msg = msg || '禁止访问';
+    this.message = msg || '禁止访问';
     this.errorCode = errorCode || 70001;
+  }
+}
+
+// 接口错误
+class ApiError extends HttpException {
+  constructor(msg, errorCode) {
+    super();
+    this.code = 500;
+    this.message = msg || '服务器内部接口调用异常';
+    this.errorCode = errorCode || 60001;
+  }
+}
+
+// 查找数据错误
+class FindDataError extends HttpException {
+  constructor(msg, errorCode) {
+    super();
+    this.code = 500;
+    this.message = msg || '数据错误';
+    this.errorCode = errorCode || 50002;
   }
 }
 
@@ -56,5 +76,7 @@ module.exports = {
   ParameterException,
   NotFound,
   AuthFailed,
-  Forbiden
+  Forbiden,
+  ApiError,
+  FindDataError
 };

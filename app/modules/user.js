@@ -3,6 +3,7 @@
  */
 const {Sequelize, Model} = require('sequelize');
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
 const {sequelize} = require('../../core/db');
 
 class User extends Model {
@@ -36,6 +37,7 @@ User.init({
   phone: {
     type: Sequelize.STRING(11),
     allowNull: false,
+    unique: true,
     comment: '手机号'
   },
   avatar: {
@@ -54,13 +56,19 @@ User.init({
     type: Sequelize.DATE,
     allowNull: false,
     defaultValue: Sequelize.NOW,
-    comment: '创建时间'
+    comment: '创建时间',
+    get() {
+      return moment(this.getDataValue('createAt')).format('YYYY-MM-DD HH:mm:ss');
+    }
   },
   updateAt: {
     type: Sequelize.DATE,
     allowNull: false,
     defaultValue: Sequelize.NOW,
-    comment: '修改时间'
+    comment: '修改时间',
+    get() {
+      return moment(this.getDataValue('updateAt')).format('YYYY-MM-DD HH:mm:ss');
+    }
   },
   isDel: {
     type: Sequelize.INTEGER(1),

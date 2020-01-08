@@ -2,6 +2,7 @@
  * 歌单表
  */
 const {Sequelize, Model} = require('sequelize');
+const moment = require('moment');
 const {sequelize} = require('../../core/db');
 
 class Playlist extends Model {
@@ -48,13 +49,19 @@ Playlist.init({
     type: Sequelize.DATE,
     allowNull: false,
     defaultValue: Sequelize.NOW,
-    comment: '创建时间'
+    comment: '创建时间',
+    get() {
+      return moment(this.getDataValue('createAt')).format('YYYY-MM-DD HH:mm:ss');
+    }
   },
   updateAt: {
     type: Sequelize.DATE,
     allowNull: false,
     defaultValue: Sequelize.NOW,
-    comment: '修改时间'
+    comment: '修改时间',
+    get() {
+      return moment(this.getDataValue('updateAt')).format('YYYY-MM-DD HH:mm:ss');
+    }
   },
   isDel: {
     type: Sequelize.INTEGER(1),

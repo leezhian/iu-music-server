@@ -25,14 +25,14 @@ const catchError = async (ctx, next) => {
 
     if (isHttpException) {
       ctx.body = {
-        msg: error.msg,
+        message: error.message,
         error_code: error.errorCode,
         requestUrl: `${ctx.method} ${ctx.path}`
       }
       ctx.status = error.code;
     } else {
       ctx.body = {
-        msg: '未知错误',
+        message: '未知错误',
         error_code: 9999,
         requestUrl: `${ctx.method} ${ctx.path}`
       }
