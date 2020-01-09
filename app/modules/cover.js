@@ -5,7 +5,24 @@ const {Sequelize, Model} = require('sequelize');
 const {sequelize} = require('../../core/db');
 
 class Cover extends Model {
+  /**
+   * 查询封面图
+   * @param type 类型
+   * @returns {Promise<any>}
+   */
+  static async selectCover(type) {
+    const data = await Cover.findOne({
+      attributes: [
+        'id',
+        'cover'
+      ],
+      where: {
+        type: type
+      }
+    });
 
+    return data;
+  }
 }
 
 Cover.init({

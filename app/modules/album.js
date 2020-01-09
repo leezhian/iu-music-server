@@ -6,6 +6,12 @@ const moment = require('moment');
 const {sequelize} = require('../../core/db');
 
 class Album extends Model {
+  /**
+   * 查询专辑列表
+   * @param page 第几页
+   * @param pageSize 每页几条
+   * @returns {Promise<any>}
+   */
   static async selectAlbum(page, pageSize) {
     const data = await Album.findAll({
       attributes: [

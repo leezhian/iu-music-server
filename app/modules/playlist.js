@@ -4,9 +4,42 @@
 const {Sequelize, Model} = require('sequelize');
 const moment = require('moment');
 const {sequelize} = require('../../core/db');
+const {User} = require('./user');
 
 class Playlist extends Model {
+  /**
+   * 查询歌单列表
+   * @param page 第几页
+   * @param pageSize 每页几条
+   * @returns {Promise<any>}
+   */
+  static async selectPlaylist(page, pageSize) {
+    const include = [{
+      association: Playlist.belongsTo(User, {foreignKey: 'user_id'}),
+      required: true,
+      attributes: []
+    }];
 
+    const data = await Playlist.findAll({
+      attributes: [
+        'id',
+        [Sequelize.col('User.username'), 'singer'],
+        ['playlist_name', 'recordName'],
+        'cover',
+        ['song_ids', 'songIds'],
+        ['listen_total', 'total'],
+        'createAt',
+        'updateAt'
+      ],
+      include: include,
+      order: [['createAt', 'DESC']],
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      raw: true
+    });
+
+    return data;
+  }
 }
 
 Playlist.init({
