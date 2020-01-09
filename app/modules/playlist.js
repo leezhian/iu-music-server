@@ -28,6 +28,7 @@ class Playlist extends Model {
         'cover',
         ['song_ids', 'songIds'],
         ['listen_total', 'total'],
+        'description',
         'createAt',
         'updateAt'
       ],
