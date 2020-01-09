@@ -19,13 +19,16 @@ const router = new Router({
 // 获取专辑列表或歌单列表
 router.get('/getRecordList.do', async (ctx, next) => {
   const query = ctx.request.query;
-  const page = query.page || 1;
-  const pageSize = query.pageSize || 6;
+  let page = query.page || 1;
+  let pageSize = query.pageSize || 6;
   const type = query.type || 1;
 
   if (!Number(page) || !Number(pageSize) || !Number(type)) {
     throw new ParameterException('参数类型错误', 10003);
   }
+
+  page = parseInt(page);
+  pageSize = parseInt(pageSize);
 
   let data = {};
   let result = [];
@@ -49,9 +52,9 @@ router.get('/getRecordList.do', async (ctx, next) => {
 });
 
 // 获取专辑详情
-router.get('/getSongList.do', async (ctx, next) => {
-  const query = ctx.request.query;
-  const songIds = query.songIds;
+router.post('/getSongList.do', async (ctx, next) => {
+  const params = ctx.request.body;
+  const songIds = params.songIds;
 
   if (!songIds) {
     throw new ParameterException('参数为空');
