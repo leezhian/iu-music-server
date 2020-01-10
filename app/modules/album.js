@@ -52,7 +52,7 @@ Album.init({
     comment: '歌手id'
   },
   album_name: {
-    type: Sequelize.STRING(30),
+    type: Sequelize.STRING(50),
     allowNull: false,
     comment: '专辑名'
   },
