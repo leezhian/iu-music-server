@@ -18,6 +18,12 @@ const LoginType = {
   isThisType
 }
 
+const Scope = {
+  GENERAL_USER: 8,
+  ADMIN: 99
+}
+
 module.exports = {
-  LoginType
+  LoginType,
+  Scope
 }

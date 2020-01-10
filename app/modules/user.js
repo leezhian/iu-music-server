@@ -5,9 +5,41 @@ const {Sequelize, Model} = require('sequelize');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const {sequelize} = require('../../core/db');
+const {NotFound, AuthFailed} = require('../../core/http-exception');
 
 class User extends Model {
-
+  /**
+   * 检验当前手机号密码是否正确
+   * @param phone 手机号
+   * @param plainPwd 加密密码
+   * @returns {Promise<any>}
+   */
+  static async verifyPhonePwd(phone, plainPwd) {
+    // 判断是否有该用户
+    const user = await User.findOne({
+      attributes: [
+        'id',
+        'username',
+        'phone',
+        'avatar',
+        ['like_id', 'likeId'],
+        ['buy_id', 'buyId']
+      ],
+      where: {
+        phone,
+        isDel: 0
+      }
+    });
+    if (!user) {
+      throw new NotFound('账号不存在');
+    }
+    // 判断是否密码正确
+    const correct = bcrypt.compareSync(plainPwd.toString(), user.password);
+    if (!correct) {
+      throw new AuthFailed('用户名或密码错误', 20003);
+    }
+    return user;
+  }
 }
 
 User.init({
