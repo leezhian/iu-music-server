@@ -88,11 +88,11 @@ router.get('/getLyric.do', async (ctx, next) => {
 
   const data = await Lyric.findOne({
     attributes: [
-      'id',
+      ['song_id','songId'],
       'lyric'
     ],
     where: {
-      id: parseInt(id)
+      song_id: parseInt(id)
     }
   });
 
