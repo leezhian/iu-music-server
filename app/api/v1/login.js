@@ -3,7 +3,11 @@
  */
 const Router = require('koa-router');
 const validator = require('validator');
+// 登录枚举
 const {LoginType, Scope} = require('../../lib/enum');
+// 解密
+const decrypt = require('../../lib/rsa');
+// 生成token
 const {generateToken} = require('../../../core/until');
 const {User} = require('../../modules/user');
 const {ParameterException, AuthFailed} = require('../../../core/http-exception');
@@ -25,7 +29,8 @@ router.post('/login.do', async (ctx, next) => {
   }
 
   phone = phone.toString();
-  pwd = pwd.toString();
+  // rsa解密
+  pwd = decrypt.decrypt(pwd, 'utf-8');
 
   if (!validator.isMobilePhone(phone, 'zh-CN')) {
     throw new ParameterException('手机号码不正确');

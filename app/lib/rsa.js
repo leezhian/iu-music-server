@@ -1,0 +1,22 @@
+/**
+ * rsa解密
+ */
+const NodeRSA  = require('node-rsa');
+
+let privateKey = '';
+const isDev = global.config.mode === 'dev';
+if (isDev) {
+    // development
+    privateKey = 'MIICXQIBAAKBgQDe6kAmUznjfZ4fZ3GVNsg8yJDZLex5hqWX0uPefUuc7qAbRfryiaAkOrpUtDpMWfJpKKc6mODdoeri27C3j99KAjkmCLQCJ0B5PhR66KB+wP05PGxqiytuoJZBVrss+eh1eHV+MP8ZmMnxCV2PB5q/6unTMHh0NeEbEE3ulchILQIDAQABAoGAPdR3yqmXCvSS4V8N8DdrvwBavQKx7ttcHwqNze6vBG5j1mzIuHFYC/SGLmx3JypjxKtUBzrUVGVPA3GwSJoNcrM1xygQLoqTcj4xrkD7YNcdbAXrAKDAynG2IsEka6arp2UB5gkGVCNPrIEmT4IbkbRCOOtlij9+7ODo7pOJInkCQQDyjAW2Xk4/Gm8M/vGHCQWWKQA8RxVYDbQSdJ1hQjejwFWgu3W/wj9qXn7Liw6e4Dm6Kb7L3rkIMg4q3jL1llo3AkEA60d4Zg9rmCEgnesVlPF+e9SZ2CLDFA6r2HP9tKVr0LAxaK2uft1o5zDV6Li4dBB2Bo8N65Cqr9Jr5vXIH/WuuwJBAOVtXdnrysgWEQWSApVhC0/G6NobwyzPiY4LkPL21/qlbFnl+LOy4pmTWQzgNKxEHVbjNf9SZmRCNPSHylxUJHECQQDpX3UPVxBUT9e4jGxV1sytK46GEsUJahwOkc7/lm3BDGOV/2DsOdZKK+ih9EgR6BoKG2+lT1PfHoslBnpBKULtAkByqBkvLkhT+b10tLs2QL7hRI5JPgK6FxoFgkoS4cwDBzHYTLU6r8medeMEOuETuh5cffEurZtvxBWUCVwgZmyF';
+} else {
+    // production
+    privateKey = 'MIICXQIBAAKBgQDe6kAmUznjfZ4fZ3GVNsg8yJDZLex5hqWX0uPefUuc7qAbRfryiaAkOrpUtDpMWfJpKKc6mODdoeri27C3j99KAjkmCLQCJ0B5PhR66KB+wP05PGxqiytuoJZBVrss+eh1eHV+MP8ZmMnxCV2PB5q/6unTMHh0NeEbEE3ulchILQIDAQABAoGAPdR3yqmXCvSS4V8N8DdrvwBavQKx7ttcHwqNze6vBG5j1mzIuHFYC/SGLmx3JypjxKtUBzrUVGVPA3GwSJoNcrM1xygQLoqTcj4xrkD7YNcdbAXrAKDAynG2IsEka6arp2UB5gkGVCNPrIEmT4IbkbRCOOtlij9+7ODo7pOJInkCQQDyjAW2Xk4/Gm8M/vGHCQWWKQA8RxVYDbQSdJ1hQjejwFWgu3W/wj9qXn7Liw6e4Dm6Kb7L3rkIMg4q3jL1llo3AkEA60d4Zg9rmCEgnesVlPF+e9SZ2CLDFA6r2HP9tKVr0LAxaK2uft1o5zDV6Li4dBB2Bo8N65Cqr9Jr5vXIH/WuuwJBAOVtXdnrysgWEQWSApVhC0/G6NobwyzPiY4LkPL21/qlbFnl+LOy4pmTWQzgNKxEHVbjNf9SZmRCNPSHylxUJHECQQDpX3UPVxBUT9e4jGxV1sytK46GEsUJahwOkc7/lm3BDGOV/2DsOdZKK+ih9EgR6BoKG2+lT1PfHoslBnpBKULtAkByqBkvLkhT+b10tLs2QL7hRI5JPgK6FxoFgkoS4cwDBzHYTLU6r8medeMEOuETuh5cffEurZtvxBWUCVwgZmyF';
+}
+
+privateKey = `-----BEGIN RSA PRIVATE KEY-----${privateKey}-----END RSA PRIVATE KEY-----`;
+
+let decrypt = new NodeRSA(privateKey);
+// 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
+decrypt.setOptions({encryptionScheme: 'pkcs1'});
+
+module.exports = decrypt;

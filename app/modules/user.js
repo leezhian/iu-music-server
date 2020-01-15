@@ -20,6 +20,7 @@ class User extends Model {
       attributes: [
         'id',
         'username',
+        'password',
         'phone',
         'avatar',
         ['like_id', 'likeId'],
