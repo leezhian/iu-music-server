@@ -1,46 +1,27 @@
 /**
- * 生成token
+ * 检查token
  */
 const Router = require('koa-router');
-const validator = require('validator');
-const {LoginType} = require('../../lib/enum');
-// const {User} = require('../../modules/user');
-// 生成token
-const {generateToken} = require('../../../core/until');
+const {User} = require('../../modules/user');
 // 错误
-const {ParameterException, AuthFailed} = require('../../../core/http-exception');
+const {ApiError} = require('../../../core/http-exception');
+const {Auth} = require('../../../middlewares/auth');
 
 const router = new Router({
-  prefix: 'api/v1/token'
+  prefix: '/api/v1'
 });
 
-router.post('/', async (ctx) => {
-  const params = ctx.request.body;
-
-
-  if (!LoginType.isThisType(params.type)) {
-    throw new ParameterException('type不合法');
+// 检查token是否有效
+router.get('/token.do', new Auth().tokenInfo, async (ctx) => {
+  if (!ctx.auth) {
+    throw new ApiError();
   }
-
-  let token;
-  switch (params.type) {
-    case LoginType.USER_MOBILE:
-      token = await phoneLogin(params.phone, params.secret);
-      break;
-    case LoginType.USER_WECHAT:
-      break;
-    default:
-      throw new AuthFailed('暂不支持该登录方式');
-  }
-
+  const data = await User.getUserInfo(ctx.auth.uid);
   ctx.body = {
-    token
+    code: 200,
+    message: '成功',
+    data
   }
 });
-
-async function phoneLogin(phone, secret) {
-  // const user = await User.verifyPhonePwd(phone, secret);
-  // return generateToken(user.id, 2);
-}
 
 module.exports = router;

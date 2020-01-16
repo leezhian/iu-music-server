@@ -5,7 +5,7 @@ const {Sequelize, Model} = require('sequelize');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const {sequelize} = require('../../core/db');
-const {NotFound, AuthFailed} = require('../../core/http-exception');
+const {NotFound, AuthFailed, ApiError} = require('../../core/http-exception');
 
 class User extends Model {
   /**
@@ -26,6 +26,7 @@ class User extends Model {
         ['like_id', 'likeId'],
         ['buy_id', 'buyId']
       ],
+      raw: true,
       where: {
         phone,
         isDel: 0
@@ -39,7 +40,38 @@ class User extends Model {
     if (!correct) {
       throw new AuthFailed('用户名或密码错误', 20003);
     }
+    user.avatar = user.avatar || '';
+    delete user.password;
     return user;
+  }
+
+  /**
+   * 获取指定用户的信息
+   * @param uid 用户id
+   * @returns {Promise<any>}
+   */
+  static async getUserInfo(uid) {
+    const user = await User.findOne({
+      attributes: [
+        'id',
+        'username',
+        'phone',
+        'avatar',
+        ['like_id', 'likeId'],
+        ['buy_id', 'buyId']
+      ],
+      where: {
+        id: uid,
+        isDel: 0
+      }
+    });
+
+    if (!user) {
+      throw new ApiError();
+    }
+
+    user.avatar = user.avatar || '';
+    return user
   }
 }
 

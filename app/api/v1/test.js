@@ -35,7 +35,7 @@ router.post('/aa', async (ctx, next) => {
 router.post('/', async (ctx, next) => {
   const salt = bcrypt.genSaltSync(10);
   // 返回加密后的密码
-  const pwd = bcrypt.hashSync('123456', salt);
+  const pwd = bcrypt.hashSync('l123456', salt);
 
   ctx.body = {
     msg: '成功',
