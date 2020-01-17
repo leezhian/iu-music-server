@@ -138,7 +138,8 @@ router.post('/forget.do', async (ctx, next) => {
   }
 
   await User.update({
-    password: pwd
+    password: pwd,
+    updateAt: new Date()
   }, {
     where: {
       phone: phone,
