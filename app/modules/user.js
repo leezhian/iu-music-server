@@ -73,6 +73,22 @@ class User extends Model {
     user.avatar = user.avatar || '';
     return user
   }
+
+  /**
+   * 判断当前手机号是否注册
+   * @param phone 手机号
+   * @returns {Promise<void>}
+   */
+  static async ifExist(phone) {
+    const isHave = await User.findOne({
+      where: {
+        phone,
+        isDel: 0
+      }
+    });
+
+    return isHave ? true : false;
+  }
 }
 
 User.init({

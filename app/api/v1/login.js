@@ -28,7 +28,6 @@ router.post('/login.do', async (ctx, next) => {
     throw new ParameterException('参数不全', 10002);
   }
 
-  phone = phone.toString();
   // rsa解密
   pwd = decrypt.decrypt(pwd, 'utf-8');
 
@@ -81,8 +80,46 @@ router.post('/register.do', async (ctx, next) => {
     throw new ParameterException('参数不全', 10002);
   }
 
-  phone = phone.toString();
-  pwd = pwd.toString();
+  if (!validator.isMobilePhone(phone, 'zh-CN')) {
+    throw new ParameterException('手机号码不正确');
+  }
+
+  if (code != 888888) {
+    throw new ParameterException('验证码错误', 10004);
+  }
+
+  const isHave = await User.ifExist(phone);
+
+  if (isHave) {
+    throw new AuthFailed('用户已存在', 20005);
+  }
+
+  // rsa解密
+  pwd = decrypt.decrypt(pwd, 'utf-8');
+
+  const user = {
+    username: `iu_${phone}`,
+    phone,
+    password: pwd,
+  }
+
+  await User.create(user);
+  ctx.body = {
+    code: 200,
+    message: '成功'
+  }
+});
+
+// 忘记密码
+router.post('/forget.do', async (ctx, next) => {
+  const params = ctx.request.body;
+  let phone = params.phone;
+  let pwd = params.password;
+  const code = params.code;
+
+  if (!phone || !pwd || !code) {
+    throw new ParameterException('参数不全', 10002);
+  }
 
   if (!validator.isMobilePhone(phone, 'zh-CN')) {
     throw new ParameterException('手机号码不正确');
@@ -92,24 +129,23 @@ router.post('/register.do', async (ctx, next) => {
     throw new ParameterException('验证码错误', 10004);
   }
 
-  const isHave = await User.findOne({
+  pwd = decrypt.decrypt(pwd, 'utf-8');
+
+  const isHave = await User.ifExist(phone);
+
+  if (!isHave) {
+    throw new AuthFailed('用户不存在', 20001);
+  }
+
+  await User.update({
+    password: pwd
+  }, {
     where: {
-      phone,
+      phone: phone,
       isDel: 0
     }
   });
 
-  if (isHave) {
-    throw new AuthFailed('用户已存在', 20005);
-  }
-
-  const user = {
-    username: `iu_${phone}`,
-    phone,
-    password: pwd,
-  }
-
-  await User.create(user);
   ctx.body = {
     code: 200,
     message: '成功'
