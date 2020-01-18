@@ -4,6 +4,7 @@
 const Router = require('koa-router');
 
 const {User} = require('../../modules/user');
+const {Auth} = require('../../../middlewares/auth');
 const {ParameterException} = require('../../../core/http-exception');
 
 // 设置路由前缀
@@ -30,6 +31,33 @@ router.get('/info.do', async (ctx, next) => {
     code: 200,
     message: '成功',
     data
+  }
+});
+
+// 修改用户昵称
+router.post('/updateName.do', new Auth().tokenInfo, async (ctx, next) => {
+  const params = ctx.request.body;
+  const username = params.username;
+
+  if (!username || username.trim() == '') {
+    throw new ParameterException('参数错误');
+  }
+
+  const uid = ctx.auth.uid;
+
+  await User.update({
+    username: username,
+    updateAt: new Date()
+  }, {
+    where: {
+      id: uid,
+      isDel: 0
+    }
+  });
+
+  ctx.body = {
+    code: 200,
+    message: '成功'
   }
 });
 
