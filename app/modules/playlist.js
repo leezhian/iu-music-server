@@ -41,6 +41,42 @@ class Playlist extends Model {
 
     return data;
   }
+
+  /**
+   * 查询属于我的歌单列表
+   * @param uid 用户id
+   * @returns {Promise<any>}
+   */
+  static async selectMyPlaylist(uid) {
+    const include = [{
+      association: Playlist.belongsTo(User, {foreignKey: 'user_id'}),
+      required: true,
+      attributes: []
+    }];
+
+    const data = await Playlist.findAll({
+      attributes: [
+        'id',
+        [Sequelize.col('User.username'), 'singer'],
+        ['playlist_name', 'recordName'],
+        'cover',
+        ['song_ids', 'songIds'],
+        ['listen_total', 'total'],
+        'description',
+        'createAt',
+        'updateAt'
+      ],
+      where: {
+        user_id: uid,
+        isDel: 0
+      },
+      include: include,
+      order: [['createAt', 'DESC']],
+      raw: true
+    });
+
+    return data;
+  }
 }
 
 Playlist.init({

@@ -4,25 +4,21 @@
 const Router = require('koa-router');
 
 const {User} = require('../../modules/user');
+const {Playlist} = require('../../modules/playlist');
 const {Auth} = require('../../../middlewares/auth');
-const {ParameterException} = require('../../../core/http-exception');
+const {ParameterException, ApiError} = require('../../../core/http-exception');
 
 // 设置路由前缀
 const router = new Router({
   prefix: '/api/v1/user'
 });
 
-// 获取专辑列表或歌单列表
-router.get('/info.do', async (ctx, next) => {
-  const query = ctx.request.query;
-  const uid = query.id;
+// 获取用户信息
+router.get('/info.do', new Auth().tokenInfo,async (ctx, next) => {
+  const uid = ctx.auth.uid;
 
   if (!uid) {
-    throw new ParameterException('参数为空');
-  }
-
-  if (!Number(uid)) {
-    throw new ParameterException('参数类型错误', 10003);
+    throw new ApiError();
   }
 
   const data = await User.getUserInfo(uid);
@@ -60,5 +56,21 @@ router.post('/updateName.do', new Auth().tokenInfo, async (ctx, next) => {
     message: '成功'
   }
 });
+
+// 获取自己创建的歌单
+router.get('/myPlaylist.do', new Auth().tokenInfo, async (ctx, next) => {
+  const uid = ctx.auth.uid;
+
+  if (!uid) {
+    throw new ApiError();
+  }
+  const data = await Playlist.selectMyPlaylist(uid);
+
+  ctx.body = {
+    code: 200,
+    message: '成功',
+    data
+  }
+})
 
 module.exports = router;
