@@ -8,6 +8,7 @@ const {Playlist} = require('../../modules/playlist');
 const {Mylike} = require('../../modules/mylike');
 const {Album} = require('../../modules/album');
 const {Singer} = require('../../modules/singer');
+const {Songs} = require('../../modules/songs');
 
 const {Auth} = require('../../../middlewares/auth');
 const {ParameterException, ApiError} = require('../../../core/http-exception');
@@ -139,6 +140,45 @@ router.get('/getRecordList.do', new Auth().tokenInfo, async (ctx, next) => {
     // 获取收藏歌单
     data = await Playlist.selectPlaylists(ids);
   }
+
+  ctx.body = {
+    code: 200,
+    message: '成功',
+    data
+  }
+});
+
+router.get('/getLikeSongs.do', new Auth().tokenInfo, async (ctx, next) => {
+  const uid = ctx.auth.uid;
+
+  if (!uid) {
+    throw new ApiError();
+  }
+
+  const likeData = await Mylike.selectData(uid);
+
+  if (!likeData) {
+    ctx.body = {
+      code: 200,
+      message: '成功',
+      data: null
+    }
+    return
+  }
+
+  // 取对应类型的数据
+  const ids = likeData.song_ids;
+  // 如果没有数据
+  if (!ids) {
+    ctx.body = {
+      code: 200,
+      message: '成功',
+      data: null
+    }
+    return
+  }
+
+  const data = await Songs.selectSongList(ids);
 
   ctx.body = {
     code: 200,

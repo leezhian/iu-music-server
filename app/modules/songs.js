@@ -4,6 +4,7 @@
 const {Sequelize, Model} = require('sequelize');
 const moment = require('moment');
 const {sequelize} = require('../../core/db');
+const {ApiError} = require('../../core/http-exception');
 
 const {Album} = require('./album');
 
@@ -13,8 +14,11 @@ class Songs extends Model {
    * @param songIds 歌曲ids
    * @returns {Promise<any>}
    */
-  static async selectSongList(songIds = '') {
+  static async selectSongList(songIds) {
     const Op = Sequelize.Op;
+    if (!songIds) {
+      throw new ApiError();
+    }
     songIds = songIds.split(',');
 
     const include = [{
