@@ -11,7 +11,7 @@ class Mylike extends Model {
    * @param uid 用户id
    * @returns {Promise<any>}
    */
-  static async findData(uid) {
+  static async selectData(uid) {
     const data = await Mylike.findOne({
       raw: true,
       where: {

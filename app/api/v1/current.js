@@ -30,6 +30,7 @@ router.get('/cover/getCover.do', async (ctx, next) => {
   }
 });
 
+// 收藏单曲、歌单、专辑
 router.post('/like/updateLike.do', new Auth().tokenInfo, async (ctx, next) => {
   const params = ctx.request.body;
   const uid = ctx.auth.uid; // 用户id
@@ -61,7 +62,7 @@ router.post('/like/updateLike.do', new Auth().tokenInfo, async (ctx, next) => {
       break;
   }
 
-  const data = await Mylike.findData(uid);
+  const data = await Mylike.selectData(uid);
   if (!data) {
     Mylike.create({
       u_id: uid,

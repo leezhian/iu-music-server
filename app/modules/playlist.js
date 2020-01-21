@@ -43,6 +43,44 @@ class Playlist extends Model {
   }
 
   /**
+   * 查询收藏歌单列表
+   * @param ids 收藏ids
+   * @returns {Promise<any>}
+   */
+  static async selectPlaylists(ids) {
+    const Op = Sequelize.Op;
+    const include = [{
+      association: Playlist.belongsTo(User, {foreignKey: 'user_id'}),
+      required: true,
+      attributes: []
+    }];
+
+    const data = await Playlist.findAll({
+      attributes: [
+        'id',
+        [Sequelize.col('User.username'), 'singer'],
+        ['playlist_name', 'recordName'],
+        'cover',
+        ['song_ids', 'songIds'],
+        ['listen_total', 'total'],
+        'description',
+        'createAt',
+        'updateAt'
+      ],
+      include: include,
+      where: {
+        id: {
+          [Op.in]: ids.split(',')
+        },
+        isDel: 0
+      },
+      raw: true
+    });
+
+    return data;
+  }
+
+  /**
    * 查询属于我的歌单列表
    * @param uid 用户id
    * @returns {Promise<any>}

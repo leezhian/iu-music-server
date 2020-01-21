@@ -5,6 +5,10 @@ const Router = require('koa-router');
 
 const {User} = require('../../modules/user');
 const {Playlist} = require('../../modules/playlist');
+const {Mylike} = require('../../modules/mylike');
+const {Album} = require('../../modules/album');
+const {Singer} = require('../../modules/singer');
+
 const {Auth} = require('../../../middlewares/auth');
 const {ParameterException, ApiError} = require('../../../core/http-exception');
 
@@ -14,7 +18,7 @@ const router = new Router({
 });
 
 // 获取用户信息
-router.get('/info.do', new Auth().tokenInfo,async (ctx, next) => {
+router.get('/info.do', new Auth().tokenInfo, async (ctx, next) => {
   const uid = ctx.auth.uid;
 
   if (!uid) {
@@ -71,6 +75,76 @@ router.get('/myPlaylist.do', new Auth().tokenInfo, async (ctx, next) => {
     message: '成功',
     data
   }
-})
+});
+
+// 获取收藏的歌单或者专辑
+router.get('/getRecordList.do', new Auth().tokenInfo, async (ctx, next) => {
+  const query = ctx.request.query;
+  let type = query.type; // 1是专辑 2是歌单
+  const uid = ctx.auth.uid;
+
+  if (!uid) {
+    throw new ApiError();
+  }
+
+  if (!type) {
+    throw new ParameterException('参数错误');
+  }
+
+  if (!Number(type)) {
+    throw new ParameterException('参数类型错误', 10003);
+  }
+
+  type = Number(type);
+
+  const likeData = await Mylike.selectData(uid);
+
+  if (!likeData) {
+    ctx.body = {
+      code: 200,
+      message: '成功',
+      data: null
+    }
+
+    return
+  }
+
+  let updateName; // 记录要修改的列
+  switch (type) {
+    case 1:
+      updateName = 'album_ids';
+      break;
+    case 2:
+      updateName = 'playlist_ids';
+      break;
+  }
+  // 取对应类型的数据
+  const ids = likeData[updateName];
+  // 如果没有数据
+  if (!ids) {
+    ctx.body = {
+      code: 200,
+      message: '成功',
+      data: null
+    }
+    return
+  }
+
+  let data;
+  if (type == 1) {
+    // 获取收藏专辑
+    data = await Album.selectAlbums(ids);
+    await Singer.selectSingers(data);
+  } else if (type == 2) {
+    // 获取收藏歌单
+    data = await Playlist.selectPlaylists(ids);
+  }
+
+  ctx.body = {
+    code: 200,
+    message: '成功',
+    data
+  }
+});
 
 module.exports = router;

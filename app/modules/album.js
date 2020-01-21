@@ -4,6 +4,7 @@
 const {Sequelize, Model} = require('sequelize');
 const moment = require('moment');
 const {sequelize} = require('../../core/db');
+const {ApiError} = require('../../core/http-exception');
 
 class Album extends Model {
   /**
@@ -32,6 +33,41 @@ class Album extends Model {
       order: [['createAt', 'DESC']],
       offset: (page - 1) * pageSize,
       limit: pageSize,
+      raw: true
+    });
+
+    return data;
+  }
+
+  /**
+   * 查询多个专辑数据
+   * @param ids 专辑ids
+   * @returns {Promise<void>}
+   */
+  static async selectAlbums(ids) {
+    const Op = Sequelize.Op;
+    if (!ids) {
+      throw new ApiError();
+    }
+    const data = await Album.findAll({
+      attributes: [
+        'id',
+        ['singer_id', 'singer_ids'],
+        ['album_name', 'recordName'],
+        'cover',
+        ['song_ids', 'songIds'],
+        'description',
+        'price',
+        ['buy_total', 'total'],
+        'createAt',
+        'updateAt'
+      ],
+      where: {
+        id: {
+          [Op.in]: ids.split(',')
+        },
+        'isDel': 0
+      },
       raw: true
     });
 
