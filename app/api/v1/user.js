@@ -148,6 +148,7 @@ router.get('/getRecordList.do', new Auth().tokenInfo, async (ctx, next) => {
   }
 });
 
+// 我喜欢的
 router.get('/getLikeSongs.do', new Auth().tokenInfo, async (ctx, next) => {
   const uid = ctx.auth.uid;
 
@@ -179,6 +180,7 @@ router.get('/getLikeSongs.do', new Auth().tokenInfo, async (ctx, next) => {
   }
 
   const data = await Songs.selectSongList(ids);
+  await Singer.selectSingers(data);
 
   ctx.body = {
     code: 200,
