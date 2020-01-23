@@ -70,6 +70,7 @@ router.post('/getSongList.do', async (ctx, next) => {
 
   const data = await Songs.selectSongList(songIds);
   await Singer.selectSingers(data);
+  await whetherLike(ctx.header.authorization, data, 3);
 
   ctx.body = {
     code: 200,

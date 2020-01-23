@@ -11,6 +11,8 @@ const {Banner} = require('../../modules/banner');
 const {Playlist} = require('../../modules/playlist');
 const {User} = require('../../modules/user');
 
+const {whetherLike} = require('../../../core/until');
+
 // 设置路由前缀
 const router = new Router({
   prefix: '/api/v1/recommend'
@@ -47,6 +49,7 @@ router.get('/getRecommendSongs.do', async (ctx, next) => {
   });
 
   await Singer.selectSingers(data);
+  await whetherLike(ctx.header.authorization, data, 3);
 
   ctx.body = {
     code: '200',
@@ -105,6 +108,8 @@ router.get('/getRecommendPlayerList.do', async (ctx, next) => {
     order: Sequelize.fn('RAND'),
     raw: true
   });
+
+  await whetherLike(ctx.header.authorization, data, 2);
 
   ctx.body = {
     code: '200',
