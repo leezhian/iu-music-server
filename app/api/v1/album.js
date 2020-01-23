@@ -11,6 +11,8 @@ const {Playlist} = require('../../modules/playlist');
 const {Songs} = require('../../modules/songs');
 const {ParameterException} = require('../../../core/http-exception');
 
+const {whetherLike} = require('../../../core/until');
+
 // 设置路由前缀
 const router = new Router({
   prefix: '/api/v1/album'
@@ -26,7 +28,7 @@ router.get('/getRecordList.do', async (ctx, next) => {
   if (!Number(page) || !Number(pageSize) || !Number(type)) {
     throw new ParameterException('参数类型错误', 10003);
   }
-
+  
   page = parseInt(page);
   pageSize = parseInt(pageSize);
 
@@ -36,9 +38,11 @@ router.get('/getRecordList.do', async (ctx, next) => {
   if (type == 1) {
     result = await Album.selectAlbum(page, pageSize);
     await Singer.selectSingers(result);
+    await whetherLike(ctx.header.authorization, result, 1);
   } else if (type == 2) {
     // 获取歌单列表
     result = await Playlist.selectPlaylist(page, pageSize);
+    await whetherLike(ctx.header.authorization, result, 2);
   }
   data.list = result || [];
   // 判断是否有下一页
@@ -88,7 +92,7 @@ router.get('/getLyric.do', async (ctx, next) => {
 
   const data = await Lyric.findOne({
     attributes: [
-      ['song_id','songId'],
+      ['song_id', 'songId'],
       'lyric'
     ],
     where: {

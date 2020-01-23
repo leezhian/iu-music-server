@@ -10,6 +10,33 @@ class Auth {
 
   }
 
+  /**
+   * 判断token是否有效，没有也不报错，即可选token，用于判断我的收藏
+   * @param authorization http header的authorization参数
+   * @returns
+   */
+  static async optionalToken(authorization) {
+    let auth = authorization || '';
+    if (auth == '') {
+      return
+    }
+    const token = auth.split(' ')[1];
+    if (token == '' || token == 'null') {
+      return
+    }
+    let decode;
+    try {
+      // 解析token
+      decode = jwt.verify(token, security.secretKey);
+    } catch (err) {
+      return
+    }
+    return {
+      uid: decode.uid,
+      scope: decode.scope
+    }
+  }
+
   get tokenInfo() {
     return async (ctx, next) => {
       let errMsg = 'token不合法';
@@ -19,12 +46,13 @@ class Auth {
         throw new Forbiden(errMsg);
       }
       const userToken = authorization.split(' ')[1];
-      if (userToken == '') {
+      if (userToken == '' || userToken == 'null') {
         throw new Forbiden(errMsg);
       }
+      let decode;
       try {
         // 解析token
-        var decode = jwt.verify(userToken, security.secretKey);
+        decode = jwt.verify(userToken, security.secretKey);
       } catch (err) {
         if (err.name == 'TokenExpiredError') {
           errMsg = 'token已过期';
