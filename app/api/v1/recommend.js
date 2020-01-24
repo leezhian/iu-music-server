@@ -18,8 +18,6 @@ const router = new Router({
   prefix: '/api/v1/recommend'
 });
 
-// const {ParameterException} = require('../../../core/http-exception');
-
 // 获取推荐单曲
 router.get('/getRecommendSongs.do', async (ctx, next) => {
   // 建立关系

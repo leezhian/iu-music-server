@@ -43,23 +43,28 @@ const whetherLike = async function (authorization, data, type) {
 
   if (userInfo) {
     const likeData = await Mylike.selectData(userInfo.uid);
-    let temp;
-    switch (type) {
-      case 1:
-        temp = 'album_ids';
-        break;
-      case 2:
-        temp = 'playlist_ids';
-        break;
-      case 3:
-        temp = 'song_ids';
-        break;
-    }
 
-    ids = likeData[temp].split(',');
+    if (likeData) {
+      let temp;
+      switch (type) {
+        case 1:
+          temp = 'album_ids';
+          break;
+        case 2:
+          temp = 'playlist_ids';
+          break;
+        case 3:
+          temp = 'song_ids';
+          break;
+      }
 
-    if (ids) {
-      haveLike = true;
+      if (likeData[temp] ) {
+        ids = likeData[temp].split(',');
+
+        if (ids) {
+          haveLike = true;
+        }
+      }
     }
   }
 
