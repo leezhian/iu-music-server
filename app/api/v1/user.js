@@ -2,6 +2,7 @@
  * 我的页接口
  */
 const Router = require('koa-router');
+const _ = require('lodash');
 
 const {User} = require('../../modules/user');
 const {Playlist} = require('../../modules/playlist');
@@ -141,6 +142,10 @@ router.get('/getRecordList.do', new Auth().tokenInfo, async (ctx, next) => {
     data = await Playlist.selectPlaylists(ids);
   }
 
+  _.forEach(data, value => {
+    value.isLike = true;
+  });
+
   ctx.body = {
     code: 200,
     message: '成功',
@@ -181,6 +186,9 @@ router.get('/getLikeSongs.do', new Auth().tokenInfo, async (ctx, next) => {
 
   const data = await Songs.selectSongList(ids);
   await Singer.selectSingers(data);
+  _.forEach(data, value => {
+    value.isLike = true;
+  });
 
   ctx.body = {
     code: 200,
